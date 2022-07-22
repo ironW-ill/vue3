@@ -1,21 +1,44 @@
-// create package.json, README, etc. for packages that don't have them yet
+// package.json과 readme를 생성하기 위한 기능
 
+
+/**
+ * 인덱스0에는 node가 오며,
+ * 인덱스1에는 현재 파일 명이 나온다.
+ * 인덱스2에는 명령행 옵션 인수가 온다.
+ * 
+ * node bootstrap.js 
+ */
 const args = require('minimist')(process.argv.slice(2))
+
+// 파일 시스템 관련 모듈
 const fs = require('fs')
+
+// 디렉토리 패스 관련 모듈
 const path = require('path')
+
+// package json 에 선언된 버전 속성을 가져온다.
 const version = require('../package.json').version
 
+// packages 폴더의 경로를 가져온다
 const packagesDir = path.resolve(__dirname, '../packages')
+
+// packages 폴더의 파일들을 배열로 가져온다
 const files = fs.readdirSync(packagesDir)
 
+// files 배열을 순회한다
 files.forEach(shortName => {
+  // 유효하지 않은 경우의 처리
   if (!fs.statSync(path.join(packagesDir, shortName)).isDirectory()) {
     return
   }
 
   const name = shortName === `vue` ? shortName : `@vue/${shortName}`
+
+  // 패키지 json 의 경로를 가져옴
   const pkgPath = path.join(packagesDir, shortName, `package.json`)
   const pkgExists = fs.existsSync(pkgPath)
+
+  // 패키지 가져옴
   if (pkgExists) {
     const pkg = require(pkgPath)
     if (pkg.private) {
